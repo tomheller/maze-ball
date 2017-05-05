@@ -49,28 +49,26 @@ class Game {
 
   handleDevicemotion(e) {
     if (!e) return;
-    if (e.gamma) {
-      this.leftright = e.gamma / -this.FACTOR;
-    }
     if (e.beta) {
-      this.updown = e.beta / this.FACTOR;
+      this.leftright = e.beta / this.FACTOR;
+    }
+    if (e.gamma) {
+      this.updown = e.gamma / this.FACTOR;
     }
   };
 
-
   attachEventHandlers() {
-    window.addEventListener('devicemotion', this.handleDevicemotion);
-    window.addEventListener('deviceorientation', this.handleDevicemotion);
+    window.addEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
+    window.addEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
   }
 
   detachEventHandlers() {
-    window.removeEventListener('devicemotion', this.handleDevicemotion);
-    window.removeEventListener('deviceorientation', this.handleDevicemotion);
+    window.removeEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
+    window.removeEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
   }
 
   update() {
     if (this.ball) {
-      console.log('has ball');
       this.ball.applyForce(this.updown, this.leftright);
     }
   }
@@ -90,11 +88,11 @@ class Game {
     Render.run(render);
 
     this.attachEventHandlers();
-    Events.on(engine, 'tick', this.update);
+    Events.on(engine, 'beforeTick', function() {this.update()}.bind(this));
   }
 
   stopGame() {
-    Events.off(engine, 'tick', this.update);
+    Events.off(engine, 'beforeTick', this.update);
     this.detachEventHandlers();
     Engine.clear(engine);
     Render.stop(render);
@@ -111,11 +109,11 @@ const handleStartGame = (e) => {
     currentGame = undefined;
     return;
   }
-  currentGame = new Game();
+  currentGame = new Game(3, 5);
   e.target.innerHTML = 'Stop game';
   const canvas = document.querySelector('canvas');
   if (canvas.webkitRequestFullscreen) {
-    //canvas.webkitRequestFullscreen();
+    canvas.webkitRequestFullscreen();
     currentGame.startGame();
   }
 };
