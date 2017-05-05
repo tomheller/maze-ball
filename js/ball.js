@@ -4,7 +4,7 @@ class Ball {
     this.y = y; 
     this.rad = rad; 
     this.matter = Matter.Bodies.circle(this.x - this.rad, this.y - this.rad, this.rad, {
-      mass: 100,
+      mass: 60,
     });
   }
 
