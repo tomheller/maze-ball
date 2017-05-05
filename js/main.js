@@ -3,29 +3,20 @@ const Render = Matter.Render;
 const World = Matter.World;
 const Bodies = Matter.Bodies;
 const Runner = Matter.Runner;
+const Events = Matter.Events;
 const engine = Engine.create();
-
-const WORLDWIDTH = 900;
-const WORLDHEIGHT = WORLDWIDTH / 16 * 9;
 
 const render = Render.create({
   element: document.getElementById('canvas'),
   engine: engine,
   options: {
-    width: WORLDWIDTH,
-    height: WORLDHEIGHT,
+    width: document.body.clientWidth,
+    height: document.body.clientHeight,
     hasBounds: true,
+    wireframes: false,
+    background: '#454546',
   }
 });
-
-
-const xGrid = 16;
-const yGrid = 9;
-const startPointX = Math.round(Math.random() * xGrid) * (WORLDWIDTH / xGrid) || (WORLDWIDTH / xGrid) * 1 ;
-const startPointY = Math.round(Math.random() * yGrid) * (WORLDHEIGHT / yGrid) || (WORLDHEIGHT / xGrid) * 1;
-console.log(startPointX, startPointY);
-const ball = new Ball(startPointX, startPointY);
-const maze = new Maze(xGrid, yGrid, WORLDWIDTH, WORLDHEIGHT);
 
 engine.world.gravity = {
   x: 0,
@@ -33,62 +24,108 @@ engine.world.gravity = {
   scale: 0,
 };
 
-World.add(engine.world, [ ball.matter, maze.matter ]);
+class Game {
+  constructor(xGrid = 16, yGrid = 9) {
+    this.xGrid = xGrid;
+    this.yGrid = yGrid;
 
-Engine.run(engine);
-Render.run(render);
+    this.FACTOR = 1000;
+    this.updown = 0;
+    this.leftright = 0;
+  }
+
+  getRandomGridPoint() {
+    const xGridEntity = (render.options.width / this.xGrid);
+    const yGridEntity = (render.options.height / this.yGrid);
+    const x = Math.floor(Math.random() * this.xGrid);
+    const y = Math.floor(Math.random() * this.yGrid);
+
+    return {
+      x: x * xGridEntity + xGridEntity / 2,
+      y: y * yGridEntity + yGridEntity / 2,
+    }
+  }
 
 
+  handleDevicemotion(e) {
+    if (!e) return;
+    if (e.gamma) {
+      this.leftright = e.gamma / -this.FACTOR;
+    }
+    if (e.beta) {
+      this.updown = e.beta / this.FACTOR;
+    }
+  };
 
-const handleGoFullscreen = () => {
+
+  attachEventHandlers() {
+    window.addEventListener('devicemotion', this.handleDevicemotion);
+    window.addEventListener('deviceorientation', this.handleDevicemotion);
+  }
+
+  detachEventHandlers() {
+    window.removeEventListener('devicemotion', this.handleDevicemotion);
+    window.removeEventListener('deviceorientation', this.handleDevicemotion);
+  }
+
+  update() {
+    if (this.ball) {
+      console.log('has ball');
+      this.ball.applyForce(this.updown, this.leftright);
+    }
+  }
+
+  startGame() {
+    console.log('startgame');
+    const startPoint = this.getRandomGridPoint();
+    this.ball = new Ball(startPoint.x, startPoint.y);
+    this.maze = new Maze(this.xGrid, this.yGrid, render.options.width, render.options.height);
+
+    const goalPoint = this.getRandomGridPoint();
+    this.goal = new Goal(goalPoint.x, goalPoint.y);
+    
+    World.add(engine.world, [this.ball.matter, this.maze.matter, this.goal.matter]);
+
+    Engine.run(engine);
+    Render.run(render);
+
+    this.attachEventHandlers();
+    Events.on(engine, 'tick', this.update);
+  }
+
+  stopGame() {
+    Events.off(engine, 'tick', this.update);
+    this.detachEventHandlers();
+    Engine.clear(engine);
+    Render.stop(render);
+    World.clear(engine.world, false);
+  }
+}
+
+
+let currentGame;
+const handleStartGame = (e) => {
+  if (currentGame) {
+    e.target.innerHTML = 'Start game';
+    currentGame.stopGame();
+    currentGame = undefined;
+    return;
+  }
+  currentGame = new Game();
+  e.target.innerHTML = 'Stop game';
   const canvas = document.querySelector('canvas');
   if (canvas.webkitRequestFullscreen) {
-    canvas.webkitRequestFullscreen();
+    //canvas.webkitRequestFullscreen();
+    currentGame.startGame();
   }
 };
-
-/*
-* Handlers
-*/
-let updown = 0;
-let leftright = 0;
-const FACTOR = 1000; 
-const handleDevicemotion = (e) => {
-  if (!e) return;
-  if (e.gamma) {
-    leftright = e.gamma / -FACTOR;
-  }
-  if (e.beta) {
-    updown = e.beta / FACTOR;
-  }
-};
-
 
 /*
 * Listener
 */
 
-window.addEventListener('devicemotion', handleDevicemotion);
-window.addEventListener('deviceorientation', handleDevicemotion);
-
-document.querySelector('button').addEventListener('click', handleGoFullscreen);
+document.querySelector('button').addEventListener('click', handleStartGame);
 
 /*
 * render loop
 */
-
-const update = () => {
-  ball.applyForce(updown, leftright);
-};
-
-ball.applyForce(0.01, 0);
-
-const runner = Runner.create();
-const debug = document.getElementById('debug');
-const draw = () => {
-  update();
-  Engine.update(engine, 1000 / 60, 1);
-  Runner.tick(runner, engine, 1000/60);  
-  requestAnimationFrame(draw);
-};
-draw();
