@@ -82,10 +82,13 @@ class Maze {
     const opts = { 
       isStatic: true,
       render: {
-        fillStyle: '#FF00FF',
+        lineWidth: 1,
+        strokeStyle: '#fefefe',
+        fillStyle: '#fefefe',
       },
     };
-    const wallWidth = 10; 
+
+    const wallWidth = 10;
 
     const northPoint = this.getPointInDirection(x, y, Maze.NORTH);
     if (gridPoint !== Maze.NORTH && northPoint !== Maze.OPPOSITE[Maze.NORTH]) {
