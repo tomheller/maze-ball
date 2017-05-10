@@ -115,6 +115,14 @@ class Game {
     }
   }
 
+  collision(e) {
+    const pair = e.pairs;
+    if (pair[0].bodyA === this.goal.matter || pair[0].bodyB === this.goal.matter ) {
+      this.stopGame();
+      this.showWinScreen();
+    }
+  }
+
   startGame() {
     console.log('startgame');
     const startPoint = this.getRandomGridPoint();
@@ -131,6 +139,7 @@ class Game {
 
     this.attachEventHandlers();
     Events.on(engine, 'beforeTick', function() {this.update()}.bind(this));
+    Events.on(engine, 'collisionStart', function(e) {this.collision(e)}.bind(this))
   }
 
   stopGame() {
@@ -139,6 +148,11 @@ class Game {
     Engine.clear(engine);
     Render.stop(render);
     World.clear(engine.world, false);
+  }
+
+  showWinScreen() {
+    const evt = new Event('win');
+    window.dispatchEvent(evt);
   }
 }
 
@@ -153,7 +167,6 @@ const handleStartGame = (e) => {
   }
   currentGame = new Game(3, 5);
   e.target.innerHTML = 'Stop game';
-  const canvas = document.querySelector('canvas');
   if (canvas.webkitRequestFullscreen) {
     // canvas.webkitRequestFullscreen();
     currentGame.startGame();
@@ -164,6 +177,10 @@ const handleStartGame = (e) => {
 * Listener
 */
 
+const canvas = document.querySelector('canvas');
+window.addEventListener('win', function() { 
+  console.log('winner winner chicken dinner');
+}, false);
 document.querySelector('button').addEventListener('click', handleStartGame);
 
 /*
