@@ -107,6 +107,8 @@ class Game {
   detachEventHandlers() {
     window.removeEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
     window.removeEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
+    window.removeEventListener('keydown', function(e) {this.handleKeyboardMotionDown(e) }.bind(this));
+    window.removeEventListener('keyup', function(e) {this.handleKeyboardMotionUp(e) }.bind(this));
   }
 
   update() {
