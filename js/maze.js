@@ -88,23 +88,25 @@ class Maze {
       },
     };
 
-    const wallWidth = 10;
+    const wallWidth = this.blockWidth * 0.2;
+    const wallHeight = this.blockHeight * 0.2;
+    
 
     const northPoint = this.getPointInDirection(x, y, Maze.NORTH);
     if (gridPoint !== Maze.NORTH && northPoint !== Maze.OPPOSITE[Maze.NORTH]) {
-      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockWidth / 2, 0, this.blockWidth + wallWidth, wallWidth, opts));
+      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockWidth / 2, 0, this.blockWidth + (wallWidth / 2), wallHeight, opts));
     }
     const southPoint = this.getPointInDirection(x, y, Maze.SOUTH);
     if (gridPoint !== Maze.SOUTH && southPoint !== Maze.OPPOSITE[Maze.SOUTH]) {
-      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockWidth / 2, this.blockWidth, this.blockWidth + wallWidth, wallWidth, opts));
+      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockWidth / 2, this.blockHeight, this.blockWidth + (wallWidth / 2), wallHeight, opts));
     }
     const westPoint = this.getPointInDirection(x, y, Maze.WEST);
     if (gridPoint !== Maze.WEST && westPoint !== Maze.OPPOSITE[Maze.WEST]) {
-      Matter.Composite.add(walls, Matter.Bodies.rectangle(0, this.blockHeight / 2, wallWidth, this.blockHeight + wallWidth, opts));
+      Matter.Composite.add(walls, Matter.Bodies.rectangle(0, this.blockHeight / 2, wallHeight, this.blockHeight + (wallWidth / 2), opts));
     }
     const eastPoint = this.getPointInDirection(x, y, Maze.EAST);
     if (gridPoint !== Maze.EAST && eastPoint !== Maze.OPPOSITE[Maze.EAST]) {
-      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockHeight, this.blockHeight / 2, wallWidth, this.blockHeight + wallWidth, opts));
+      Matter.Composite.add(walls, Matter.Bodies.rectangle(this.blockWidth, this.blockHeight / 2, wallHeight, this.blockHeight + (wallWidth / 2), opts));
     }
     
     const translate = Matter.Vector.create(x * this.blockWidth, y * this.blockHeight);

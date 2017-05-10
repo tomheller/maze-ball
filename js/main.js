@@ -57,9 +57,51 @@ class Game {
     }
   };
 
+  handleKeyboardMotionDown(e) {
+    const f = 0.01;
+    switch (e.keyCode) {
+      case 37:
+        // left
+        this.updown -= f;
+        break;
+      case 38:
+        this.leftright -= f;
+        // up
+        break;
+      case 39: 
+        this.updown += f;
+        // right
+        break;
+      case 40:
+        this.leftright += f;
+        // down
+        break;
+    }
+  }
+
+  handleKeyboardMotionUp(e) {
+    const f = 0.01;
+    switch (e.keyCode) {
+      case 37:
+      case 39: 
+        // right
+        // left
+        this.updown = 0;
+        break;
+      case 38:
+      case 40:
+        // up
+        // down
+        this.leftright = 0;
+        break;
+    }
+  }
+
   attachEventHandlers() {
     window.addEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
     window.addEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
+    window.addEventListener('keydown', function(e) {this.handleKeyboardMotionDown(e) }.bind(this));
+    window.addEventListener('keyup', function(e) {this.handleKeyboardMotionUp(e) }.bind(this));
   }
 
   detachEventHandlers() {
@@ -113,7 +155,7 @@ const handleStartGame = (e) => {
   e.target.innerHTML = 'Stop game';
   const canvas = document.querySelector('canvas');
   if (canvas.webkitRequestFullscreen) {
-    canvas.webkitRequestFullscreen();
+    // canvas.webkitRequestFullscreen();
     currentGame.startGame();
   }
 };
