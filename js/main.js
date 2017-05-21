@@ -2,7 +2,6 @@ const Engine = Matter.Engine;
 const Render = Matter.Render;
 const World = Matter.World;
 const Bodies = Matter.Bodies;
-const Runner = Matter.Runner;
 const Events = Matter.Events;
 const engine = Engine.create();
 
@@ -24,6 +23,8 @@ engine.world.gravity = {
   scale: 0,
 };
 
+Engine.run(engine);
+
 class Game {
   constructor(xGrid = 16, yGrid = 9) {
     this.xGrid = xGrid;
@@ -35,6 +36,8 @@ class Game {
     this.devicemotion = this.handleDevicemotion.bind(this);
     this.keyboardMotionDown = this.handleKeyboardMotionDown.bind(this);
     this.keyboardMotionUp = this.handleKeyboardMotionUp.bind(this);
+    this.update = this.updateState.bind(this);
+    this.collision = this.handleCollision.bind(this);
   }
 
   getRandomGridPoint() {
@@ -62,7 +65,6 @@ class Game {
 
   handleKeyboardMotionDown(e) {
     const f = 0.01;
-    console.log('keydown')
     switch (e.keyCode) {
       case 37:
         // left
@@ -115,15 +117,16 @@ class Game {
     window.removeEventListener('keyup', this.keyboardMotionUp);
   }
 
-  update() {
+  updateState(e) {
     if (this.ball) {
       this.ball.applyForce(this.updown, this.leftright);
     }
   }
 
-  collision(e) {
+  handleCollision(e) {
     const pair = e.pairs;
-    if (pair[0].bodyA === this.goal.matter || pair[0].bodyB === this.goal.matter ) {
+    if ( !pair.length ) return;
+    if ( pair[0].bodyA === this.goal.matter || pair[0].bodyB === this.goal.matter ) {
       this.stopGame();
       this.showWinScreen();
     }
@@ -140,21 +143,23 @@ class Game {
     this.goal = new Goal(goalPoint.x, goalPoint.y);
     
     World.add(engine.world, [this.ball.matter, this.maze.matter, this.goal.matter]);
-
-    Engine.run(engine);
+  
     Render.run(render);
 
     this.attachEventHandlers();
-    Events.on(engine, 'beforeTick', function() {this.update()}.bind(this));
-    Events.on(engine, 'collisionStart', function(e) {this.collision(e)}.bind(this))
+    this.updown = 0;
+    this.leftright = 0;
+    Events.on(engine, 'beforeUpdate', this.update);
+    Events.on(engine, 'collisionStart', this.collision);
   }
 
   stopGame() {
-    Events.off(engine, 'beforeTick', this.update);
+    Events.off(engine, 'beforeUpdate', this.update);
+    Events.off(engine, 'collisionStart', this.collision);
     this.detachEventHandlers();
+    World.clear(engine.world, false);
     Engine.clear(engine);
     Render.stop(render);
-    World.clear(engine.world, false);
   }
 
   showWinScreen() {
@@ -186,7 +191,8 @@ const handleStartGame = (e) => {
 
 const canvas = document.querySelector('canvas');
 window.addEventListener('win', function() { 
-  console.log('winner winner chicken dinner');
+  currentGame = new Game(3, 5);
+  currentGame.startGame(Math.random() * 1000);
 }, false);
 document.querySelector('button').addEventListener('click', handleStartGame);
 
