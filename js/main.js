@@ -131,7 +131,7 @@ class Game {
 
   startGame(s) {
     console.log('startgame');
-    seed = s || 250;
+    seed = s || 0;
     const startPoint = this.getRandomGridPoint();
     this.ball = new Ball(startPoint.x, startPoint.y);
     this.maze = new Maze(this.xGrid, this.yGrid, render.options.width, render.options.height);
@@ -176,7 +176,7 @@ const handleStartGame = (e) => {
   e.target.innerHTML = 'Stop game';
   if (canvas.webkitRequestFullscreen) {
     // canvas.webkitRequestFullscreen();
-    currentGame.startGame();
+    currentGame.startGame(Math.random() * 1000);
   }
 };
 
