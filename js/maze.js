@@ -117,7 +117,7 @@ class Maze {
 
   carvePassageFrom(x, y, grid) {
     const directions = [Maze.NORTH, Maze.SOUTH, Maze.EAST, Maze.WEST]
-      .sort(f => 0.5 - Math.random());
+      .sort(f => 0.5 - random());
     
     directions.forEach(dir => {
       const nX = x + Maze.DX[dir];

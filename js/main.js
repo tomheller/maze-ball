@@ -32,13 +32,16 @@ class Game {
     this.FACTOR = 1000;
     this.updown = 0;
     this.leftright = 0;
+    this.devicemotion = this.handleDevicemotion.bind(this);
+    this.keyboardMotionDown = this.handleKeyboardMotionDown.bind(this);
+    this.keyboardMotionUp = this.handleKeyboardMotionUp.bind(this);
   }
 
   getRandomGridPoint() {
     const xGridEntity = (render.options.width / this.xGrid);
     const yGridEntity = (render.options.height / this.yGrid);
-    const x = Math.floor(Math.random() * this.xGrid);
-    const y = Math.floor(Math.random() * this.yGrid);
+    const x = Math.floor(random() * this.xGrid);
+    const y = Math.floor(random() * this.yGrid);
 
     return {
       x: x * xGridEntity + xGridEntity / 2,
@@ -59,6 +62,7 @@ class Game {
 
   handleKeyboardMotionDown(e) {
     const f = 0.01;
+    console.log('keydown')
     switch (e.keyCode) {
       case 37:
         // left
@@ -98,17 +102,17 @@ class Game {
   }
 
   attachEventHandlers() {
-    window.addEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
-    window.addEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
-    window.addEventListener('keydown', function(e) {this.handleKeyboardMotionDown(e) }.bind(this));
-    window.addEventListener('keyup', function(e) {this.handleKeyboardMotionUp(e) }.bind(this));
+    window.addEventListener('devicemotion', this.devicemotion);
+    window.addEventListener('deviceorientation', this.devicemotion);
+    window.addEventListener('keydown', this.keyboardMotionDown);
+    window.addEventListener('keyup', this.keyboardMotionUp);
   }
 
   detachEventHandlers() {
-    window.removeEventListener('devicemotion', function(e) { this.handleDevicemotion(e) }.bind(this));
-    window.removeEventListener('deviceorientation', function(e) { this.handleDevicemotion(e) }.bind(this));
-    window.removeEventListener('keydown', function(e) {this.handleKeyboardMotionDown(e) }.bind(this));
-    window.removeEventListener('keyup', function(e) {this.handleKeyboardMotionUp(e) }.bind(this));
+    window.removeEventListener('devicemotion', this.devicemotion);
+    window.removeEventListener('deviceorientation', this.devicemotion);
+    window.removeEventListener('keydown', this.keyboardMotionDown);
+    window.removeEventListener('keyup', this.keyboardMotionUp);
   }
 
   update() {
@@ -125,8 +129,9 @@ class Game {
     }
   }
 
-  startGame() {
+  startGame(s) {
     console.log('startgame');
+    seed = s || 250;
     const startPoint = this.getRandomGridPoint();
     this.ball = new Ball(startPoint.x, startPoint.y);
     this.maze = new Maze(this.xGrid, this.yGrid, render.options.width, render.options.height);
