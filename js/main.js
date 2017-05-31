@@ -35,12 +35,13 @@ const handleStartGame = (e) => {
     currentGame = undefined;
     return;
   }
-  currentGame = new Game(3, 5);
+  currentGame = new Game(8, 5);
   e.target.innerHTML = 'Stop game';
   if (canvas.webkitRequestFullscreen) {
-    // canvas.webkitRequestFullscreen();
-    currentGame.startGame(Math.random() * 1000);
+    canvas.webkitRequestFullscreen();
   }
+  document.querySelector('.ui').remove();
+  currentGame.startGame(Math.random() * 1000);
 };
 
 /*
@@ -49,7 +50,7 @@ const handleStartGame = (e) => {
 
 const canvas = document.querySelector('canvas');
 window.addEventListener('win', function() { 
-  currentGame = new Game(3, 5);
+  currentGame = new Game(8, 5);
   currentGame.startGame(Math.random() * 1000);
 }, false);
 document.querySelector('button').addEventListener('click', handleStartGame);

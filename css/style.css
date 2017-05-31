@@ -2,8 +2,13 @@ html,
 body {
   margin: 0;
   width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+.ui + .container {
+  width: 0;
+  height: 0;
 }
 
 canvas {
@@ -11,11 +16,12 @@ canvas {
   max-height: 100vh;
 }
 
+p {
+  max-width: 20rem;
+}
+
 .ui {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -25,8 +31,30 @@ canvas {
 .uiscreen {
   justify-content: center;
   text-align: center;
+  padding: 1rem;
+}
+
+@media(min-width: 1400px) {
+  .uiscreen {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
 }
 
 .logo {
   width: 100%;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 2rem;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #ff9800;
+  color: #fff;
+  border: 0;
+  margin-bottom: 3rem 
 }
